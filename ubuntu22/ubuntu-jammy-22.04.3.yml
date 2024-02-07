@@ -29,7 +29,7 @@
       apt:
         update_cache: yes
         
-    - name: install packages #000
+    - name: install vscodium and docker
       package:
         name:
           - codium
@@ -44,6 +44,39 @@
       user:
         name: macm
         groups: docker
-        append: yes        
-      
+        append: yes      
+
+    - name: download k3d install script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/rancher/k3d/main/install.sh
+        dest: /tmp/install_k3d
+        mode: 'u+rwx,g+rx,o+rx'
+
+    - name: install k3d
+      script: /tmp/install_k3d
+
+    - name: download helm install script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        dest: /tmp/install_helm
+        mode: 'u+rwx,g+rx,o+rx'
+
+    - name: install helm
+      script: /tmp/install_helm
+
+    - name: install kubectl
+      ansible.builtin.get_url:
+        # url: https://dl.k8s.io/release/stable.txt
+        url: https://dl.k8s.io/release/v1.29.1/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: 'u+rwx,g+rx,o+rx'
+
+    - name: download k9s package        
+      ansible.builtin.get_url:
+        url: https://github.com/derailed/k9s/releases/download/v0.30.8/k9s_linux_amd64.deb
+        dest: /tmp/k9s_linux_amd64.deb
+
+    - name: install k9s
+      command: dpkg -i /tmp/k9s_linux_amd64.deb
+
 ...
