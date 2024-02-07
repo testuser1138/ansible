@@ -1,0 +1,49 @@
+---
+
+- hosts: localhost
+  become: true
+  tasks:
+    - name: add vscodium apt key
+      apt_key:
+        url: https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
+        state: present
+        
+    - name: add vscodium apt repo
+      apt_repository:
+        repo: deb https://download.vscodium.com/debs vscodium main
+        state: present
+        filename: vscodium.list
+
+    - name: add docker apt key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+        
+    - name: add docker apt repo
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
+        state: present
+        filename: docker.list
+
+    - name: update apt cache
+      apt:
+        update_cache: yes
+        
+    - name: install packages #000
+      package:
+        name:
+          - codium
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin          
+        state: present
+
+    - name: add macm to docker group
+      user:
+        name: macm
+        groups: docker
+        append: yes        
+      
+...
