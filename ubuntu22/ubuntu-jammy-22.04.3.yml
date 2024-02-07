@@ -79,4 +79,45 @@
     - name: install k9s
       command: dpkg -i /tmp/k9s_linux_amd64.deb
 
+    - name: install packages required by virtualbox
+      apt:
+        name:
+          - dkms
+          - apt-transport-https
+          - ca-certificates
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: add virtualbox repository key
+      apt_key:
+        url: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+        state: present
+
+    - name: add virtualbox repo
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian {{ ansible_distribution_release }} contrib"
+        state: present
+
+    - name: update apt cache after adding repository
+      apt:
+        update_cache: yes
+
+    - name: install virtualbox
+      apt:
+        name: virtualbox-6.1  # Adjust the version if needed
+        state: present
+
+    - name: Add user to vboxusers group
+      user:
+        name: macm
+        groups: vboxusers
+        append: yes
+
+    - name: start and enable virtualbox service
+      service:
+        name: vboxdrv
+        state: started
+        enabled: yes
+
 ...
